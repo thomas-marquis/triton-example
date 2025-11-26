@@ -1,0 +1,21 @@
+
+
+RTX 3060 6Go RAM
+
+We want to multiply tow vectors (term by term) A and B and store the results in a vector C
+
+Let's start with a simple implementation using python
+
+```python
+A = [...]
+B = [...]
+assert len(A) == len(B)
+C = [
+    a * b
+    for a, b
+    in zip(A, B)
+]
+```
+
+
+avec 1Md d'item =>
