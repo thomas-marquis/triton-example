@@ -38,14 +38,16 @@ def pytorch_gpu():
 
 @time_it
 def triton_baseline():
-    A = torch.rand(VEC_SIZE, device=GPU_DEVICE)
-    B = torch.rand(VEC_SIZE, device=GPU_DEVICE)
-    output = torch.empty_like(A)
-    n_elements = output.numel()
+    # A = torch.rand(VEC_SIZE, device=GPU_DEVICE)
+    # B = torch.rand(VEC_SIZE, device=GPU_DEVICE)
+    n_elements = 1000
+    A = torch.arange(0, 1000, 10, device=GPU_DEVICE)
+    B = torch.arange(0, 10000, 100, device=GPU_DEVICE)
+    output = torch.zeros(n_elements, device=GPU_DEVICE)
 
-    grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']),)
+    # grid = lambda meta: (triton.cdiv(n_elements, meta['BATCH_SIZE']),)
     yield "act"
-    kernel_add[grid](A, B, output, n_elements, BLOCK_SIZE=1)
+    kernel_add[(8,)](A, B, output, n_elements, BATCH_SIZE=128)
 
     return output
 
