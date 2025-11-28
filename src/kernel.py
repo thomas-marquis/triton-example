@@ -2,11 +2,17 @@ import triton
 import triton.language as tl
 
 
+
+@triton.jit
+def a_triton_kernel(A, B, C, nb_elements, block_size):
+    ...
+
+
 @triton.jit
 def kernel_add(
     x_ptr: tl.pointer_type,
-    y_ptr,
-    output_ptr,
+    y_ptr: tl.pointer_type,
+    output_ptr: tl.pointer_type,
     n_elements,
     BATCH_SIZE: tl.constexpr
 ):
