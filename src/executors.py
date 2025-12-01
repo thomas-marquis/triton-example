@@ -1,6 +1,12 @@
+import math
+import itertools
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor
+
 import torch
 import triton
 
+import triton.language as tl
 from src.utils import time_it, generate_rand_vec
 from src.kernel import kernel_add
 
@@ -16,6 +22,33 @@ def simple_loop():
 
     yield "act"
     return [a + b for a, b in zip(A, B)]
+
+
+@time_it
+def with_threads():
+    # A = generate_rand_vec(VEC_SIZE)
+    # B = generate_rand_vec(VEC_SIZE)
+    A = list(range(0, 100, 10))
+    B = list(range(0, 1000, 100))
+
+    yield "act"
+
+    def add_vec(vec1: list[float], vec2: list[float]) -> list[float]:
+        return [a + b for a, b in zip(vec1, vec2)]
+
+    nb_cpu = multiprocessing.cpu_count()
+    block_size = 4
+    nb_blocks = math.ceil(len(A) / block_size)
+    with ThreadPoolExecutor(max_workers=nb_cpu) as executor:
+        futures = [
+            executor.submit(add_vec,
+                            A[i*block_size: (i+1)*block_size],
+                            B[i*block_size: (i+1)*block_size])
+            for i in range(nb_blocks)
+        ]
+        C = list(itertools.chain(*[fut.result() for fut in futures]))
+
+    return C
 
 
 @time_it

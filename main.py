@@ -5,8 +5,9 @@ def main() -> None:
     # executors.simple_loop()
     # executors.pytorch_cpu()
     # executors.pytorch_gpu()
-    executors.triton_baseline()
+    # executors.triton_baseline()
     # executors.faster_triton()
+    executors.with_threads()
 
     print("END")
 
