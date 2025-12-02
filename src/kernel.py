@@ -2,16 +2,19 @@ import triton
 import triton.language as tl
 
 @triton.jit
-def kernel_add_(A, B, C, n_elements, block_size):
+def kernel_add(A_ptr, B_ptr, C_ptr, n_elements, block_size: tl.constexpr):
     pid = tl.program_id(axis=0)
 
     block_start = pid * block_size
     offsets = block_start + tl.arange(0, block_size)
     mask = offsets < n_elements
 
-    x = tl.load(A + offsets, mask=mask)
-    y = tl.load(B + offsets, mask=mask)
+    a = tl.load(A_ptr + offsets, mask=mask)
+    b = tl.load(B_ptr + offsets, mask=mask)
 
-    output = x + y
+    c = a + b
 
-    tl.store(C + offsets, output, mask=mask)
+    tl.store(C_ptr + offsets, c, mask=mask)
+
+
+

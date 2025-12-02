@@ -1,7 +1,7 @@
 import random
 import inspect
 from time import perf_counter
-from typing import Generator, Callable
+from typing import Generator, Callable, Any
 from functools import wraps
 
 
@@ -9,12 +9,12 @@ def generate_rand_vec(size: int) -> list[float]:
     return [random.random() for _ in range(size)]
 
 
-def time_it[T](func: Callable[[], Generator[str, None, T]]) -> Callable[[], T]:
+def time_it[T](func: Callable[..., Generator[str, None, T]]) -> Callable[..., tuple[T, float]]:
     assert inspect.isgeneratorfunction(func), "generator function expected"
 
     @wraps(func)
-    def wrapper() -> T:
-        gen = func()
+    def wrapper(*args, **kwargs) -> tuple[T, float]:
+        gen = func(*args, **kwargs)
         t0 = None
         elapsed = None
         res = None
@@ -38,6 +38,6 @@ def time_it[T](func: Callable[[], Generator[str, None, T]]) -> Callable[[], T]:
 
         if elapsed is not None:
             print(f"elapsed time for {func.__name__}: {elapsed:.5f}s")
-        return res
+        return res, elapsed
 
     return wrapper
